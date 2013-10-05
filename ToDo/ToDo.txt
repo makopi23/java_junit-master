@@ -1,0 +1,72 @@
+ペアプロお題 : Javaの奇妙なバージョン
+http://devtesting.jp/tddbc/?TDDBC%E6%A8%AA%E6%B5%9C3rd%2F%E6%BC%94%E7%BF%92
+
+---
+■仕様の矛盾点
+1. CPUが４回連続できたら、LUがスキップ？
+2. 例：X1を予定外アップデートに使うと、CPUと番号が重複する
+3. 初期値はJDK7u40とする。
+4. 予定外アップデートは2,3,4,6,7,8,9
+
+■題１のToDo
+1. JDK7u40と入力されたらtrueと返すべき
+2. hogeと入力されたらfalseと返すべき
+3. JDK7u9xと入力されたらfalseと返すべき
+---
+4. JDK7U40と入力されたらtrueと返すべき
+5. JDK7u040と入力されたらfalseと返すべき
+6. JDK07u40と入力されたらfalseと返すべき
+7. JDK17u340と入力されたらtrueと返すべき
+×8. JDK7u39と入力されたらfalseと返すべき
+9. JDK7u0と入力されたらtrueと返すべき
+
+★はまった点
+---
+●１
+package tddbc;
+
+public class Version {
+	public static boolean isValid(String version){
+		if("JDK7u40".equals(version)){
+			return true;
+		}
+
+		return false;
+	}
+}
+●２
+テストメソッド追加時に、それがコケても、他のテストメソッドが実行される。なぜか。
+
+正規表現でEclipseで一括置換
+置換前：void (.+)と入力されたらisValidメソッドが(.+)と返すべき
+置換後：void isValidメソッドに\1が渡されたときに\2と返すべき
+
+■題２
+ToDo
+
+1. JDK7u40と入力されたらJavaVersionのインスタンスを返すべき
+2. JDK7u40と入力されたらFamilyNumberが7でupdateNumberが40を返すべき
+3. hogeと入力されたらIllegalArgumentExceptionを返すべき
+4. JDK7u9xと入力されたらIllegalArgumentExceptionを返すべき
+---
+5. JDK7U40と入力されたらFamilyNumberが8でupdateNumberが50を返すべき
+6. JDK7u040と入力されたらIllegalArgumentExceptionを返すべき
+×7. JDK07u40と入力されたらIllegalArgumentExceptionを返すべき
+
+全角数字を入れたケースは？
+
+
+IllegalArgumentExceptionとNumberFormatExceptionが継承関係にあるので、意図しないグリーンが発生する。
+
+不吉な臭い　リファクタリング
+
+
+
+■題３
+ToDo
+
+1～4は、紙のとおり
+5. JDK8u40.gt(JDK7u50) => true
+6. JDK8u40.gt(JDK8u40) => false
+7. JDK8u40.lt(JDK7u50) => false
+8. JDK8u40.lt(JDK8u40) => false
